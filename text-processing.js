@@ -5,7 +5,7 @@ const API_URL = 'https://api.textrazor.com';
 const REQUEST_HEADERS = {
   'X-TextRazor-Key': '7b177ab63d438808a6fbd9c451b4e492499029cddd0fe02c11cbf016',
    'Content-Encoding': 'gzip', 
-   'Content-Type': 'application/x-www-form-urlencoded',
+   'Content-Type': 'application/x-www-form-urlencoded'
 };
 // Button click handler
 const onAnalyzeButtonClick = () => {
