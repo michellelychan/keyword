@@ -26,7 +26,6 @@ label, textarea {
 .main-input-comment { margin-bottom: 20px; }
 .main-comment-area {
   width: 95%;
-  min-height: 300px; 
   border: #ced4da 1px solid;
   border-radius: 10px;
   resize: none;
