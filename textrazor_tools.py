@@ -24,9 +24,4 @@ for topic in response.topics():
 	print topic.label, topic.score
 
 
-json_content = response.json
-new_response = textrazor.TextRazorResponse(json_content) 
-
-print new_response.raw_text
-
 # entity.freebase_types  
