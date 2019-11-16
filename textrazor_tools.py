@@ -9,19 +9,19 @@ response = client.analyze_url("https://www.scmp.com/sport/martial-arts/mixed-mar
 # response = client.analyze_url("https://www.scmp.com/news/hong-kong/politics/article/3038049/pla-soldiers-sent-streets-hong-kong-first-time-protests")
 
 
-print "Entity id | Relevance Score | Confidence Score"
+print ("Entity id | Relevance Score | Confidence Score")
 
 response.entities().sort(key=lambda x: x.relevance_score, reverse=True)
 
 for entity in response.entities():
-    print entity.id, entity.relevance_score, entity.confidence_score
+    print (entity.id, entity.relevance_score, entity.confidence_score)
 
-print"----------------------------------------"
-print "Topic Label | Topic Score"
+print("----------------------------------------")
+print ("Topic Label | Topic Score")
 response.topics().sort(key=lambda x: x.score, reverse=True)
 
 for topic in response.topics(): 
-	print topic.label, topic.score
+	print (topic.label, topic.score) 
 
 
 # entity.freebase_types  

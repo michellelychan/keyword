@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-import textrazor
+import textrazor, textrazor_tools
 
 
 app = Flask(__name__)
@@ -14,7 +14,7 @@ api = textrazor.api_key
 @app.route('/')
 def home():
 	# return textrazor.api_key
-	return render_template('index.html', name='Michelle', api=textrazor.api_key )
+	return render_template('index.html', api=textrazor.api_key )
 
 @app.route('/<name>')
 def hello_name(name):

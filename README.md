@@ -9,3 +9,5 @@ Only the following files are useful:
 I still haven't linked the files up. 
 
 To run app, run app.py
+
+Local Host 5000 
