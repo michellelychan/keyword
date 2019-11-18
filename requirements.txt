@@ -8,14 +8,11 @@ Jinja2==2.10.3
 lxml==4.4.1
 MarkupSafe==1.1.1
 newsapi==0.1.1
-nltk==3.4.5
-numpy==1.17.3
 pandas==0.25.2
 python-dateutil==2.8.0
 pytrends==4.7.2
 pytz==2019.3
 requests==2.22.0
 six==1.12.0
-textblob==0.15.3
 urllib3==1.25.6
 Werkzeug==0.16.0
