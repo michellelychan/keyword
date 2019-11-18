@@ -1,57 +1,98 @@
-* {
-  font-family: "Arial", Arial, sans-serif;
-  font-weight: 400;
-  padding: 0;ь
-  margin: 0;
-  border: 0;
+html {
+    -webkit-font-smoothing: antialiased;
 }
-body {
+body, html {
+  padding: 0;
+  font-family: Roboto, Arial, sans-serif;
+  height: 100%;
+}
+
+.top-bar {
   padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: #001246;
+  color: #fff;
+  font-size: 18px;
 }
-label, textarea {
-  display: block;
+
+h4 {
+  margin-top: 8px;
+  margin-bottom: 4px;
 }
-.main {
-  padding: 10px;
-  width: 35%;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+
+h5 {
+  color: #4b6584;
 }
-.main-header {
-  text-align: center;
-  margin-bottom: 20px;
+
+input[type="search"] {
+  background-color: #fff;
+  border-radius: 18px;
+  height: 30px;
+  line-height: 20px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  width: 70%;
+  -webkit-appearance: searchfield;
 }
-.main-input-comment { margin-bottom: 20px; }
-.main-comment-area {
-  width: 95%;
-  border: #ced4da 1px solid;
-  border-radius: 10px;
-  resize: none;
-  padding: 10px;
-  margin-bottom: 10px;
-  font-size: 16px;
+
+button:focus,
+input:focus {
+    outline: none;
 }
-.main-analyze-button {
-  width: 100%;
-  padding: 5px;
-  border: 1px solid #007bff;
-  background-color: #007bff;
-  border-radius: 7px;
-  color: white;
-  text-align: center;
-  font-size: 16px;
-  outline: none;
-}
-.main-analyze-button::-moz-focus-inner {border: 0;}
-.main-analyze-button:hover {
-  background-color: #0069d9;
-  border-color: #0069d9;
+
+button.go-button {
+  border-radius: 20px;
+  background: #f7b731;
+  color: #fff;
+  width: 50px;
+  height: 30px;
   cursor: pointer;
 }
-.main-result-block { text-align: center; }
-.pos { color: green; }
-.neg { color: darkred; }
-.neutral { color: gray }
-.invisible { display: none; }
+
+hr {
+  border: 1px solid #333;
+  width: 100px;
+  margin-top:20px;
+  margin-left: 0px;
+}
+
+button.suggest-button {
+  border-radius: 20px;
+  background: #2bcbba;
+  color: #fff;
+  width: 100px;
+  height: 30px;
+  cursor: pointer;
+}
+
+#editor {
+  width: 100%;
+  display: block;
+}
+.ql-toolbar {
+  display: block;
+}
+#suggestions {
+  width: 30%;
+  background-color: #d1d8e0;
+  padding: 20px;
+  height: 100%;
+  min-width: 300px;
+}
+
+.container {
+  display: flex;
+  height: 100%;
+}
+
+.item {
+  height: 100px;
+  width: 100px; /* A fixed width as the default */
+}
+
+.item-center {
+  flex-grow: 1; /* Set the middle element to grow and stretch */
+}
+
+.item + .item {
+  margin-left: 2%;
+}

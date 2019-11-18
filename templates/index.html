@@ -2,36 +2,200 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Text Processing</title>
-  <!-- Import our css styles -->
+  <title>SEO Keyword v0.1</title>
+  <!-- Include Quill stylesheet -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" integrity="sha256-WAgYcAck1C1/zEl5sBl5cfyhxtLgKGdpI3oKyJffVRI=" crossorigin="anonymous" />
+  <link href="//cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
+  <link href="//cdn.quilljs.com/1.0.0/quill.bubble.css" rel="stylesheet">
+  <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../static/tags.css">
   <link rel="stylesheet" href="../static/styles.css">
+  <link rel="stylesheet" href="../static/jquery.dynatable.css">
+
 </head>
 <body>
-  <div class="main">
-      <h2 class="main-header">Text analysis</h2>
-      <div>{{ api }}</div>
-      <section class="main-input-comment">
-          <label for="url">Article URL</label>
-          <textarea
-                  name="url"
-                  id="url"
-                  class="main-comment-area"
-                  placeholder="Your url..."
-          >
-          </textarea>
-          <button class="main-analyze-button" onclick="onAnalyzeButtonClick()">Analyze...</button>
-      </section>
-      <section class="main-result">
-          <p id="main-result-block" class="main-result-block invisible">
-              <span>Result:</span>
-              <span id="result"></span>
-          </p>
-      </section>
+  <div class="top-bar"><b>SCMP</b> SEO Keyword suggestions</div>
+  <!-- Create the editor container -->
+  <div class="container">
+    <div class="item-center">
+      <div id="editor">
+        <p></p>
+      </div>
+    </div>
+    <div id="suggestions" class="item">
+      <h4>Import story with ID</h4>
+      <input type="search" name="story-id" class="story-id" autocomplete="on">
+      <button class="go-button" >Go</button>
+      <hr>
+      <h4>Suggested keywords <button class="suggest-button" >⟳ Update</button></h4>
+
+      <div class="keyword-container tag-wrapper">
+
+      </div>
+
+      <h5>News / Keywords from news sites</h5>
+      <div class="newsapi-container">
+      </div>
+      <h5>Keywords from Trends</h5>
+      <div class="googletrend-table-top">
+      </div>
+      <div class="googletrend-table-rising">
+      </div>
+      <h5>Keywords from MOZ / SEMRush</h5>
+    </div>
   </div>
-  <!-- Import axios library -->
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <!-- Querystring library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.7.0/qs.min.js"></script>
-  <!-- Import our javascript file -->
-  <script src="text-processing.js"></script>
+
+
+  <!-- Include the Quill library -->
+  <script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+  <script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
+  <script src="../static/jquery.dynatable.js"></script>
+  <script>
+
+    $.dynatableSetup({
+      table: {
+        defaultColumnIdStyle: 'underscore'
+      }
+    });
+
+  </script>
+  <!-- Initialize Quill editor -->
+  <script>
+    var editor = new Quill('#editor', {
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, false] }],
+          ['bold', 'italic', 'underline'],
+          ['image', 'code-block']
+        ]
+      },
+      placeholder: 'Start composing...',
+      theme: 'snow'  // 'snow' or 'bubble'
+    });
+  </script>
+
+
+
+  <script>
+
+    // Persist Story ID
+    $(".story-id").change(function(){
+        var $this = $(this);
+        var prev = $this.data("prev"); // first time is undefined
+        $this.data("prev", $this.val()); // save current value
+    });
+
+
+
+    // UI
+    function createTag(name, score) {
+      let tagElement = '<div class="tag"> <input class="tag-checkbox" type="checkbox" value="%%tag_value%%"/> <label for="">%%tag_name%% (%%tag_score%%)</label> <i class="fa fa-plus"></i> <i class="fa fa-check"></i> </div>';
+
+      tagElement = tagElement.replace('%%tag_name%%', ''+name);
+      // let score_name=name.replace(/ /g,"_");
+      tagElement = tagElement.replace('%%tag_value%%', ''+name);
+      tagElement = tagElement.replace('%%tag_score%%', ''+score.toFixed(2));
+
+      return $('.tag-wrapper').append($(tagElement));
+    }
+
+    $(".go-button").on('click', function getFromAPI() {
+      $('.tag-wrapper').empty();
+      let storyId = $(".story-id").val();
+      function decodeString(input) {
+        var parser = new DOMParser;
+        var dom = parser.parseFromString(
+            '<!doctype html><body>' + input,
+            'text/html');
+        var decodedString = dom.body.textContent;
+        return decodedString;
+      }
+
+      $.get( "extract-text/"+storyId )
+        .done(function( data ) {
+          editor.setContents([
+            { insert: decodeString(data.title)+'\n', attributes: { 'header': true } },
+            { insert: '\n'},
+            { insert: decodeString(data.summary)+'\n', attributes: { 'code-block': true } },
+            { insert: '\n'},
+            { insert: decodeString(data.body) }
+          ]);
+
+
+        }).fail(function(error) {
+            alert( "Fail to load: Story with ID " + storyId );
+        });
+
+    });
+
+
+    $(".suggest-button").on('click', function getKeywords() {
+      $('.tag-wrapper').empty();
+      let content = editor.getText();
+      $.get( "extract-keywords/", {fulltext: content})
+        .done(function( data ) {
+          $( ".result" ).html( data );
+
+          console.log(data);
+
+          for (var key of Object.keys(data)) {
+              console.log(key + " -> " + data[key])
+              if(Number(data[key]) >= 0.15) {
+                createdTag = createTag(key, data[key]);
+              }
+          }
+
+          $('.tag-checkbox:checkbox').change(function newsapi() {
+              // this will contain a reference to the checkbox
+              if (this.checked) {
+                  // the checkbox is now checked
+                  let keyword = $(this).val();
+                  console.log(keyword)
+                  $.get( "newsapi/"+keyword)
+                    .done(function( data ) {
+                      console.log(data);
+                      for (var key of Object.keys(data)) {
+                          console.log(key + " -> " + data[key])
+                          alert('Found Related News: '+ key)
+                      }
+
+
+                    }).fail(function(error) {
+                        alert( "Fail to get keywords" );
+                    });
+
+
+
+                  $.get( "googletrend/"+keyword)
+                    .done(function( data ) {
+                      console.log(data);
+                      alert('(WIP) TOP Queries:\n -----\n'+ JSON.stringify(JSON.parse(data.top).query));
+                      alert('(WIP) RISING Queries:\n----- \n'+ JSON.stringify(JSON.parse(data.rising).query));
+
+                    }).fail(function(error) {
+                        alert( "Fail to get keywords" );
+                    });
+
+
+
+
+              } else {
+                  // the checkbox is now no longer checked
+              }
+          });
+
+        }).fail(function(error) {
+            alert( "Fail to get keywords" );
+        });
+
+    });
+
+
+  </script>
 </body>
+
+
+</html>
