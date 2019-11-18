@@ -65,9 +65,9 @@ def extract_text(article_id):
             ogimage=ogimage
     )
 
-@app.route('/extract-keywords/')
+@app.route('/extract-keywords', methods = ['POST'])
 def extract_keywords():
-    full_text = request.args.get('fulltext')
+    full_text = request.form.get('fulltext')
 
     textrazor.api_key = TEXTRAZOR_KEY
 

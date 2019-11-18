@@ -50,6 +50,7 @@
         <div class="rising-keyword-container tag-wrapper"></div>
       </div>
       <h5>Keywords from MOZ / SEMRush</h5>
+      <div class="moz-keyword-container tag-wrapper"></div>
     </div>
   </div>
 
@@ -287,7 +288,7 @@
           bindTooltip();
 
         }).fail(function(error) {
-            console( `Fail to get keywords for ${keyword}` );
+            console.log(`Fail to get keywords for ${keyword}` );
         });
    }
 
@@ -296,7 +297,7 @@
       $('.browser-screen-loading-content').show();
       $('.tag-wrapper').empty();
       let content = editor.getText();
-      $.get( "extract-keywords/", {fulltext: content})
+      $.post( "extract-keywords", {fulltext: content})
         .done(function( data ) {
           $('.browser-screen-loading-content').hide();
           console.log(data);
