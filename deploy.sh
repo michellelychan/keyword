@@ -1,4 +1,3 @@
-
 export PYTHONPATH=.
 export FLASK_APP=web
 apt-get update -qy
