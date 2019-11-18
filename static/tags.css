@@ -51,8 +51,9 @@
   background-color: #f19066;
 }
 .tag.newsapi label {
-  min-width: 100%;
-  background-color: #444;
+  min-width: 80%;
+  background-color: #aaa;
+  color: #333;
 }
 
 .tag .fa {
