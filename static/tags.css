@@ -11,6 +11,13 @@
   max-height: 70%;
   overflow-y: auto;
 }
+
+.tag-wrapper:empty:after{
+  content: "Nothing to show yet.";
+  color: #afb0b0;
+  font-size: 14px;
+
+}
 .tag {
   display: inline-block;
   position: relative;
