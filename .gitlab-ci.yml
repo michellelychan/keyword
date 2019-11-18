@@ -23,7 +23,7 @@ stages:
 build app:
   stage: build
   script:
-    - docker build --pull -t $CONTAINER_IMAGE -f ./app/Dockerfile ./app
+    - docker build --pull -t $CONTAINER_IMAGE -f ./Dockerfile ./
     - docker push $CONTAINER_IMAGE
 
 ### Deploy section managed by System Team or Docker Guild members.
