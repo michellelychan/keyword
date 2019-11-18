@@ -1,15 +1,48 @@
 stages:
   - build
   - deploy
-build job:
+
+
+before_script:
+  - docker info
+  - docker login $CI_REGISTRY -u gitlab-ci-token -p $CI_JOB_TOKEN
+
+variables:
+  DOCKER_DRIVER: overlay2
+  CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+stages:
+  - build
+  - deploy
+
+### Jobs
+build app:
   stage: build
   script:
-    - export PYTHONPATH=.
-    - export FLASK_APP=web
-    - apt-get update -qy
-    - apt-get install -y python3-dev python3-pip
-    - pip3 install Flask gunicorn pytest pytest-cov
-    - pytest tests --cov --cov-report term --cov-report html
-deploy job:
+    - docker build --pull -t $CONTAINER_IMAGE -f ./app/Dockerfile ./app
+    - docker push $CONTAINER_IMAGE
+
+
+### Deploy section managed by System Team or Docker Guild members.
+.deploy_template: &deploy
   stage: deploy
+  image: registry.scmp.tech/technology/system/kubectl:latest
+  services: []
+  before_script: [ kubectl-auth ]
   script:
+    - /bin/sh k8s/deploy.sh
+
+deploy Staging:
+  <<: *deploy
+  only:
+    - master
+  variables:
+    K8S_API: $DEV_K8S_API
+    K8S_CA: $DEV_K8S_CA
+    K8S_NS: $DEV_K8S_NS
+    K8S_TKN: $DEV_K8S_TKN
+    K8S_PROJECT: $CI_PROJECT_NAME
+  environment:
+    name: Staging
+    url: https://staging-$CI_PROJECT_NAME.$DEV_K8S_NS.dev.scmp.tech
+
