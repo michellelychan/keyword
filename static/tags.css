@@ -3,7 +3,7 @@
   background: white;
   width: auto;
   margin: 0 auto;
-  margin-top: 30px;
+  margin-top: 16px;
   padding: 10px;
   text-align: left;
   border-radius: 5px;
@@ -13,7 +13,7 @@
 }
 
 .tag-wrapper:empty:after{
-  content: "Nothing to show yet.";
+  content: "Nothing to show yet";
   color: #afb0b0;
   font-size: 14px;
 
@@ -36,6 +36,7 @@
 .tag input[type=checkbox]:hover + label {
   background: #f7b731;
 }
+
 .tag label {
   padding: 7px 34px 6px 18px;
   position: relative;
@@ -46,6 +47,14 @@
   background: #305ae3;
   transition: all 0.08s ease-in;
 }
+.tag.google label {
+  background-color: #f19066;
+}
+.tag.newsapi label {
+  min-width: 100%;
+  background-color: #444;
+}
+
 .tag .fa {
   position: absolute;
   z-index: 250;

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SEO Keyword v0.2</title>
+  <title>SEO Keyword v0.3</title>
   <!-- Include Quill stylesheet -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css" integrity="sha256-WAgYcAck1C1/zEl5sBl5cfyhxtLgKGdpI3oKyJffVRI=" crossorigin="anonymous" />
   <link href="//cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
@@ -31,15 +31,23 @@
       <img width="256" height="144" id="thumbnail-preview">
       <h4>Suggested keywords <button class="suggest-button" >⟳ Update</button></h4>
 
+      <div class="browser-screen-loading-content">
+        <div class="loading-dots dark-gray">
+          <i></i><i></i><i></i><i></i>
+        </div>
+      </div>
       <div class="keyword-container tag-wrapper"></div>
 
-      <h5>News / Keywords from news sites</h5>
+      <h5>Related news from other media</h5>
       <div class="newsapi-container">
+        <div class="newsapi-article-container tag-wrapper"></div>
       </div>
       <h5>Keywords from Trends</h5>
       <div class="googletrend-table-top">
+        <div class="top-keyword-container tag-wrapper"></div>
       </div>
       <div class="googletrend-table-rising">
+        <div class="rising-keyword-container tag-wrapper"></div>
       </div>
       <h5>Keywords from MOZ / SEMRush</h5>
     </div>
@@ -80,7 +88,6 @@
   </script>
 
 
-
   <script>
 
     // Persist Story ID
@@ -90,11 +97,9 @@
         $this.data("prev", $this.val()); // save current value
     });
 
-
-
     // UI
-    function createTag(name, score, types) {
-      let tagElement = '<div class="tag tooltip" data-name="%%tag_data%%" title="This is my span\'s tooltip message!"> <input class="tag-checkbox" type="checkbox" value="%%tag_value%%"/> <label for="">%%tag_name%% (%%tag_score%%)</label> <i class="fa fa-plus"></i> <i class="fa fa-check"></i> </div>';
+    function createTag(name, score, types, checked) {
+      let tagElement = '<div class="tag tooltip" data-name="%%tag_data%%" title=""> <input class="tag-checkbox" type="checkbox" value="%%tag_value%%" %%checked%%/> <label for="">%%tag_name%% (%%tag_score%%)</label> <i class="fa fa-plus"></i> <i class="fa fa-check"></i> </div>';
 
       tagElement = tagElement.replace('%%tag_data%%', ''+name);
       tagElement = tagElement.replace('%%tag_name%%', ''+name);
@@ -102,7 +107,104 @@
       tagElement = tagElement.replace('%%tag_value%%', ''+name);
       tagElement = tagElement.replace('%%tag_score%%', ''+score.toFixed(2));
 
-      return $('.tag-wrapper').append($(tagElement));
+      if (checked) {
+        tagElement = tagElement.replace('%%checked%%', 'checked');
+      } else {
+        tagElement = tagElement.replace('%%checked%%', '');
+      }
+      return $('.keyword-container').append($(tagElement));
+    }
+
+    function createGoogleTrendTag(name, api_type) {
+      let tagElement = '<div class="tag google tooltip" data-name="%%tag_data%%" title=""> <input class="tag-checkbox" type="checkbox" value="%%tag_value%%"/> <label for="">%%tag_name%% (%%api_type%%)</label> <i class="fa fa-plus"></i> <i class="fa fa-check"></i> </div>';
+
+      tagElement = tagElement.replace('%%tag_data%%', ''+name);
+      tagElement = tagElement.replace('%%tag_name%%', ''+name);
+      tagElement = tagElement.replace('%%api_type%%', ''+api_type);
+      if (api_type === "rising") {
+        return $('.rising-keyword-container').append($(tagElement));
+      } else {
+        return $('.top-keyword-container').append($(tagElement));
+      }
+    }
+
+    function createNewsArticleTag(title, source, keyword ) {
+      let tagElement = '<div class="tag newsapi tooltip" data-name="%%tag_data%%" title=""> <input class="tag-checkbox" type="checkbox" value="%%tag_value%%"/> <label for="">%%tag_name%% (%%source%%)</label></div>';
+
+      tagElement = tagElement.replace('%%tag_data%%', ''+keyword);
+      tagElement = tagElement.replace('%%tag_name%%', ''+title);
+      tagElement = tagElement.replace('%%source%%', ''+source);
+      return $('.newsapi-article-container').append($(tagElement));
+    }
+
+    function bindTooltip() {
+      $('.tooltip').tooltipster({
+        content: 'Loading...',
+        maxWidth: 300,
+        updateAnimation: false,
+        functionBefore: function(instance, helper) {
+          //wiki
+          console.log(instance.elementOrigin());
+          let value = $(instance.elementOrigin()).data("name")
+
+          let url = `/wiki/${value}`;
+
+              $.get(url)
+                .done(function( data ) {
+                  console.log(data);
+                  let result = JSON.parse(data)[2][0];
+                  console.log(result);
+                  instance.content(result);
+                })
+
+        },
+        functionAfter: function(instance) {
+          // alert('The tooltip has closed!');
+        }
+      });
+
+      $('.tag-checkbox:checkbox').change(function newsapi() {
+          // this will contain a reference to the checkbox
+          if (this.checked) {
+              // the checkbox is now checked
+              let keyword = $(this).val();
+              console.log(keyword)
+              // $.get( "newsapi/"+keyword)
+              //   .done(function( data ) {
+              //     console.log(data);
+              //     for (var key of Object.keys(data)) {
+              //         console.log(key + " -> " + data[key])
+              //         Swal.fire('Found Related News: '+ key)
+              //     }
+              //   }).fail(function(error) {
+              //       Swal.fire( "Fail to get keywords" );
+              //   });
+
+
+              //{articles:[title, url, source:{name}]}
+
+              fetch(`https://gnews.io/api/v3/search?q=${keyword}&token=7da223236b596fb89142aa6508ccedd9`).then(function (response) {
+                return response.json();
+              }).then(function (data) {
+                console.log(data);
+                let articles = data.articles;
+                for (x in articles) {
+                  let article = articles[x]
+                  createNewsArticleTag(article.title, article.source.name, keyword);
+                }
+                bindTooltip();
+
+              });
+
+              callGoogleAPI(keyword);
+
+
+          } else {
+              // the checkbox is now no longer checked
+          }
+      });
+
+
     }
 
     $(".go-button").on('click', function getFromAPI() {
@@ -156,12 +258,47 @@
         return(sorted_obj)
     }
 
+
+   function callGoogleAPI(keyword) {
+      $.get( "googletrend/"+keyword)
+        .done(function( data ) {
+          console.log(data);
+          let top = JSON.parse(data.top).query;
+          let rising = JSON.parse(data.rising).query;
+
+          for ( x in top) {
+            let word = top[x]
+            createGoogleTrendTag(word, 'top');
+
+            if (x >= 3) {
+              break;
+            }
+          }
+
+          for (y in rising) {
+            let word = rising[y]
+            createGoogleTrendTag(word, 'rising');
+
+            if (y >= 3) {
+              break;
+            }
+          }
+
+          bindTooltip();
+
+        }).fail(function(error) {
+            console( `Fail to get keywords for ${keyword}` );
+        });
+   }
+
     /* Extract Keywords */
     $(".suggest-button").on('click', function getKeywords() {
+      $('.browser-screen-loading-content').show();
       $('.tag-wrapper').empty();
       let content = editor.getText();
       $.get( "extract-keywords/", {fulltext: content})
         .done(function( data ) {
+          $('.browser-screen-loading-content').hide();
           console.log(data);
 
           resultObj = {};
@@ -175,79 +312,34 @@
               resultObj[key] = JSON.parse(data[key]);
           }
 
-          res = sort_object(resultObj)
+          res = sort_object(resultObj);
+
+          let headerText = ""
+          if (editor.getLength() >= 1) {
+            headerText = editor.getContents().ops[0].insert;
+          }
+
+          let checkedItems = [];
           for (var key of Object.keys(res)) {
               let values = JSON.parse(data[key]);
               let relevanceScore = values.relevance_score;
               let confidenceScore = values.confidence_score;
               let freebaseTypes = values.freebase_types;
               if(Number(relevanceScore) >= 0.3 && confidenceScore >= 0.5) {
-                createdTag = createTag(key, relevanceScore, freebaseTypes);
+                let checked = headerText.toLowerCase().includes(key.toLowerCase())
+                createdTag = createTag(key, relevanceScore, freebaseTypes, checked);
+
+                if(checked) {
+                  checkedItems.push(key);
+                  callGoogleAPI(key);
+                }
               }
           }
 
+          // checkedItems
+
           // Bind tooltip events
-          // $('.tooltip').tooltipster();
-
-          $('.tooltip').tooltipster({
-            content: 'Loading...',
-            updateAnimation: false,
-            functionBefore: function(instance, helper) {
-              //wiki
-              console.log(instance.elementOrigin());
-              let value = $(instance.elementOrigin()).data("name")
-
-              let url = `/wiki/${value}`;
-
-                  $.get(url)
-                    .done(function( data ) {
-                      console.log(data);
-                      let result = JSON.parse(data)[2][0];
-                      console.log(result);
-                      instance.content(result);
-                    })
-
-            },
-            functionAfter: function(instance) {
-              // alert('The tooltip has closed!');
-            }
-          });
-
-
-
-          $('.tag-checkbox:checkbox').change(function newsapi() {
-              // this will contain a reference to the checkbox
-              if (this.checked) {
-                  // the checkbox is now checked
-                  let keyword = $(this).val();
-                  console.log(keyword)
-                  $.get( "newsapi/"+keyword)
-                    .done(function( data ) {
-                      console.log(data);
-                      for (var key of Object.keys(data)) {
-                          console.log(key + " -> " + data[key])
-                          Swal.fire('Found Related News: '+ key)
-                      }
-                    }).fail(function(error) {
-                        Swal.fire( "Fail to get keywords" );
-                    });
-
-
-                  $.get( "googletrend/"+keyword)
-                    .done(function( data ) {
-                      console.log(data);
-                      Swal.fire('(WIP) TOP Queries:\n -----\n'+ JSON.stringify(JSON.parse(data.top).query));
-                      Swal.fire('(WIP) RISING Queries:\n----- \n'+ JSON.stringify(JSON.parse(data.rising).query));
-
-                    }).fail(function(error) {
-                        Swal.fire( "Fail to get keywords" );
-                    });
-
-
-              } else {
-                  // the checkbox is now no longer checked
-              }
-          });
+          bindTooltip();
 
         }).fail(function(error) {
             alert( "Fail to get keywords" );
