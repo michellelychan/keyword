@@ -87,7 +87,7 @@ button.suggest-button {
   background-color: #d1d8e0;
   padding: 20px;
   height: 100%;
-  min-width: 300px;
+  min-width: 400px;
   overflow-y: auto;
 }
 

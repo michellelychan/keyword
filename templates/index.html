@@ -164,12 +164,16 @@
         }
       });
 
+    }
+
+    function bindGNewsAPIEvents() {
+      // Call GNews api
       $('.tag-checkbox:checkbox').change(function newsapi() {
           // this will contain a reference to the checkbox
           if (this.checked) {
               // the checkbox is now checked
               let keyword = $(this).val();
-              console.log(keyword)
+              console.log(keyword);
               // $.get( "newsapi/"+keyword)
               //   .done(function( data ) {
               //     console.log(data);
@@ -184,7 +188,7 @@
 
               //{articles:[title, url, source:{name}]}
 
-              fetch(`https://gnews.io/api/v3/search?q=${keyword}&token=7da223236b596fb89142aa6508ccedd9`).then(function (response) {
+              fetch(`https://gnews.io/api/v3/search?q=${keyword}&token=a0e5763dfc3bcf8f5acd046ba2e21f7b`).then(function (response) {
                 return response.json();
               }).then(function (data) {
                 console.log(data);
@@ -192,9 +196,10 @@
                 for (x in articles) {
                   let article = articles[x]
                   createNewsArticleTag(article.title, article.source.name, keyword);
+                  if(x > 5) {
+                    break;
+                  }
                 }
-                bindTooltip();
-
               });
 
               callGoogleAPI(keyword);
@@ -205,10 +210,10 @@
           }
       });
 
-
     }
 
     $(".go-button").on('click', function getFromAPI() {
+      $('.browser-screen-loading-content').show();
       $('.tag-wrapper').empty();
       $("#thumbnail-preview").attr('src', '');
       $("#thumbnail-preview").hide();
@@ -224,6 +229,7 @@
 
       $.get( "extract-text/"+storyId )
         .done(function( data ) {
+          $('.browser-screen-loading-content').hide();
           editor.setContents([
             { insert: decodeString(data.title)+'\n', attributes: { 'header': true } },
             { insert: '\n'},
@@ -337,10 +343,10 @@
               }
           }
 
-          // checkedItems
 
           // Bind tooltip events
           bindTooltip();
+          bindGNewsAPIEvents();
 
         }).fail(function(error) {
             alert( "Fail to get keywords" );

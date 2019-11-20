@@ -22,7 +22,6 @@
   display: inline-block;
   position: relative;
   margin: 4px 8px 4px 0px;
-  font-size: 9px;
 }
 .tag input[type=checkbox] {
   opacity: 0;
@@ -46,6 +45,7 @@
   border-radius: 16px;
   background: #305ae3;
   transition: all 0.08s ease-in;
+  font-size: 12px;
 }
 .tag.google label {
   background-color: #f19066;
