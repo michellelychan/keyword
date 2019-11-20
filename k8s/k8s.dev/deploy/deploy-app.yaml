@@ -1,0 +1,36 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: staging-app-${K8S_PROJECT}
+  namespace: ${K8S_NS}
+  labels:
+    project: ${K8S_PROJECT}
+    env: staging
+    app: app
+    tier: frontend
+spec:
+  replicas: 2
+  revisionHistoryLimit: 0
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        project: ${K8S_PROJECT}
+        env: staging
+        app: app
+        tier: frontend
+    spec:
+      containers:
+        - name: app
+          image: ${CONTAINER_IMAGE}
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: staging-app-${K8S_PROJECT}
+            - secretRef:
+                name: k8s-template

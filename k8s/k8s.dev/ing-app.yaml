@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: staging-k8s-template2
+  namespace: guilds
+  labels:
+    project: k8s-template2
+    env: staging
+  annotations:
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-secret: ing-auth-default
+    ingress.kubernetes.io/auth-realm: "Protected area"
+    ingress.kubernetes.io/configuration-snippet: |
+      satisfy any;
+      allow 202.22.242.242/32;
+      allow 202.22.240.65/32;
+      allow 202.22.242.243/32;
+      deny all;
+spec:
+  tls:
+    - hosts:
+      - staging-k8s-template.guilds.dev.scmp.tech
+      secretName: ing-tls-default
+  rules:
+    - host: staging-k8s-template2.guilds.dev.scmp.tech
+      http:
+        paths:
+        - backend:
+            serviceName: staging-app-k8s-template2
+            servicePort: 8080
