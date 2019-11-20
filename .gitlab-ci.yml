@@ -40,8 +40,10 @@ deploy Staging:
   only:
     - master
   variables:
+ variables:
     K8S_API: $DEV_K8S_API
-    K8S_NS: GROWTH
+    K8S_CA: $DEV_K8S_CA
+    K8S_NS: $DEV_K8S_NS
     K8S_TKN: $DEV_K8S_TKN
     K8S_PROJECT: $CI_PROJECT_NAME
   environment:
