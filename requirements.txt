@@ -9,7 +9,7 @@ Jinja2==2.10.3
 lxml==4.4.1
 MarkupSafe==1.1.1
 newsapi-python==0.2.5
-numpy==1.17.4
+numpy==1.22.0
 pandas==0.25.2
 python-dateutil==2.8.0
 pytrends==4.7.2
